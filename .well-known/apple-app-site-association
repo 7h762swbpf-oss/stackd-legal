@@ -1,8 +1,21 @@
 {
   "applinks": {
     "details": [
-      { "appIDs": ["PH9Z8UGM35.com.stackdsocial.stackd"], "components": [ { "/": "/confirm*" } ] }
+      {
+        "appIDs": [
+          "PH9Z8UGM35.com.stackdsocial.stackd"
+        ],
+        "components": [
+          {
+            "/": "/confirm*"
+          }
+        ]
+      }
     ]
   },
-  "webcredentials": { "apps": ["PH9Z8UGM35.com.stackdsocial.stackd"] }
+  "webcredentials": {
+    "apps": [
+      "PH9Z8UGM35.com.stackdsocial.stackd"
+    ]
+  }
 }
