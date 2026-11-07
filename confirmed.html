@@ -40,6 +40,9 @@ summary::-webkit-details-marker { display: none; }
 summary::after { content: "+"; color: var(--muted); font-weight: 400; }
 details[open] summary::after { content: "–"; }
 details p { margin: 8px 0 0; color: var(--muted); }
+.button { display: inline-block; padding: 14px 28px; border-radius: 999px; background: var(--accent); color: #fff;
+  font-weight: 700; margin: 6px 0 4px; }
+.button:hover { text-decoration: none; opacity: .9; }
 .promise { display: flex; gap: 14px; align-items: flex-start; }
 .promise .lock { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff;
   display: grid; place-items: center; font-size: 18px; }
@@ -52,7 +55,10 @@ footer { max-width: 760px; margin: 0 auto 40px; padding: 0 20px; color: var(--mu
 <nav><a href="index.html">Home</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="support.html">Support</a></nav>
 <main><div class="card">
 <div id="ok"><h1>You're confirmed ✓</h1>
-<p>Your email address is verified. Go back to Stackd and sign in with your email and password.</p></div>
+<p>Your email address is verified. Head back to Stackd and you'll be signed straight in.</p>
+<p><a class="button" href="stackd://confirmed">Open Stackd</a></p>
+<p class="muted">Confirmed on a computer? Open Stackd on your phone and it'll carry on by itself, or sign in with your
+email and password.</p></div>
 <div id="failed" hidden><h1>That link has expired</h1>
 <p>Confirmation links only work once, for a limited time. Open Stackd and sign up again with the same email
 address, and we'll send you a fresh link.</p></div>
