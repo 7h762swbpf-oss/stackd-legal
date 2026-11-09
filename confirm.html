@@ -60,16 +60,57 @@ footer { max-width: 760px; margin: 0 auto 40px; padding: 0 20px; color: var(--mu
 <div id="failed" hidden><h1>That link has expired</h1>
 <p>Confirmation links only work once, for a limited time. Open Stackd and tap Resend email, or sign up again with the
 same address, and we'll send you a fresh link.</p></div>
+<div id="reset" hidden><h1>Choose a new password</h1>
+<form id="resetform" style="display:grid;gap:12px;max-width:340px">
+<input id="pw" type="password" autocomplete="new-password" placeholder="New password (at least 6 characters)" style="font:inherit;padding:12px;border-radius:12px;border:1px solid #8886">
+<input id="pw2" type="password" autocomplete="new-password" placeholder="Type it again" style="font:inherit;padding:12px;border-radius:12px;border:1px solid #8886">
+<button id="save" style="font:inherit;font-weight:700;padding:13px;border:0;border-radius:999px;background:#0070e6;color:#fff">Save new password</button>
+<p id="pwerror" class="muted" role="alert"></p></form></div>
+<div id="changed" hidden><h1>Password changed ✓</h1><p>You can now sign in to Stackd with your new password.</p></div>
+<div id="resetfailed" hidden><h1>That link has expired</h1>
+<p>Reset links only work once, for a limited time. In Stackd, tap Forgotten your password? to get a new one.</p></div>
 <script>
 (async () => {
-  const show = (id) => { for (const x of ["working", "ok", "failed"]) document.getElementById(x).hidden = x !== id; };
+  const views = ["working", "ok", "failed", "reset", "changed", "resetfailed"];
+  const show = (id) => { for (const x of views) document.getElementById(x).hidden = x !== id; };
   const q = new URLSearchParams(location.search);
   const token = q.get("token_hash");
+  const api = { "apikey": "sb_publishable_Oqs6AyzyMNIt1jLvwbAwPQ_b54jD_QL", "Content-Type": "application/json" };
+  // A password reset waits for the form: nothing is used up until someone actually sets a new password.
+  if (q.get("type") === "recovery") {
+    document.title = "Reset your password";
+    if (!token) return show("resetfailed");
+    show("reset");
+    let session = null;
+    document.getElementById("resetform").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const error = document.getElementById("pwerror");
+      const pw = document.getElementById("pw").value;
+      if (pw.length < 6) { error.textContent = "Use at least 6 characters."; return; }
+      if (pw !== document.getElementById("pw2").value) { error.textContent = "Those passwords don't match."; return; }
+      error.textContent = "One moment…";
+      try {
+        if (!session) {
+          const verified = await fetch("https://mtyfwforilmwifkcfmvv.supabase.co/auth/v1/verify", { method: "POST", headers: api,
+            body: JSON.stringify({ token_hash: token, type: "recovery" }) });
+          if (!verified.ok) return show("resetfailed");
+          session = await verified.json();
+        }
+        const saved = await fetch("https://mtyfwforilmwifkcfmvv.supabase.co/auth/v1/user", { method: "PUT",
+          headers: { ...api, "Authorization": "Bearer " + session.access_token }, body: JSON.stringify({ password: pw }) });
+        if (saved.ok) return show("changed");
+        const body = await saved.json().catch(() => ({}));
+        error.textContent = body.error_code === "same_password" ? "That's your current password. Choose a different one."
+          : "Couldn't save that. Please try again.";
+      } catch { error.textContent = "Couldn't reach Stackd. Please try again."; }
+    });
+    return;
+  }
   if (!token) return show("failed");
   try {
     const res = await fetch("https://mtyfwforilmwifkcfmvv.supabase.co/auth/v1/verify", {
       method: "POST",
-      headers: { "apikey": "sb_publishable_Oqs6AyzyMNIt1jLvwbAwPQ_b54jD_QL", "Content-Type": "application/json" },
+      headers: api,
       body: JSON.stringify({ token_hash: token, type: q.get("type") || "signup" }),
     });
     show(res.ok ? "ok" : "failed");
